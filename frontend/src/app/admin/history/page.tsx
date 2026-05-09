@@ -77,7 +77,7 @@ export default function AdminHistoryPage() {
                 </div>
                 <div className="flex-1 px-3 py-2.5 border-t border-l border-[#5b5b5b]">
                   <span className="font-normal text-black text-base leading-6 tracking-[0]">
-                    {row.status === 'RESERVED' ? 'Reserve' : row.status === 'CANCELLED' ? 'Cancel' : row.status}
+                    Reserve
                   </span>
                 </div>
               </div>

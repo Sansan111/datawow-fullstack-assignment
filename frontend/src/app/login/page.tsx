@@ -24,7 +24,7 @@ export default function LoginPage() {
     try {
       const data = await loginUser(email, password)
       saveToken(data.access_token)
-      router.push('/')
+      router.push('/user')
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Login failed'
       if (typeof err === 'object' && err !== null && 'response' in err) {

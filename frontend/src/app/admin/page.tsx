@@ -64,10 +64,8 @@ export default function AdminDashboardPage() {
       const seats = concertList.reduce((sum, c) => sum + c.totalSeats, 0)
       setTotalSeats(seats)
 
-      const reservedCount = reservations.filter((r) => r.status === 'RESERVED' || r.status === 'reserved').length
-      const cancelledCount = reservations.filter((r) => r.status === 'CANCELLED' || r.status === 'cancelled').length
-      setReserved(reservedCount)
-      setCancelled(cancelledCount)
+      setReserved(reservations.length)
+      setCancelled(0)
     } catch {
       // silently fail if not authenticated yet
     }

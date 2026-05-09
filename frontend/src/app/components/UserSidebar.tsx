@@ -12,16 +12,7 @@ function HomeIcon() {
   )
 }
 
-function HistoryIcon() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" />
-      <polyline points="12 6 12 12 16 14" />
-    </svg>
-  )
-}
-
-function SwitchUserIcon() {
+function SwitchAdminIcon() {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="23 4 23 10 17 10" />
@@ -48,19 +39,18 @@ interface NavItem {
   href?: string
 }
 
-export default function AdminSidebar() {
+export default function UserSidebar() {
   const router = useRouter()
   const pathname = usePathname()
 
   const handleLogout = () => {
     removeToken()
-    router.push('/admin/login')
+    router.push('/login')
   }
 
   const navItems: NavItem[] = [
-    { id: 'home', label: 'Home', icon: <HomeIcon />, href: '/admin' },
-    { id: 'history', label: 'History', icon: <HistoryIcon />, href: '/admin/history' },
-    { id: 'switch', label: 'Switch to user', icon: <SwitchUserIcon />, href: '/' },
+    { id: 'home', label: 'Home', icon: <HomeIcon />, href: '/user' },
+    { id: 'switch', label: 'Switch to Admin', icon: <SwitchAdminIcon />, href: '/admin/login' },
   ]
 
   return (
@@ -68,14 +58,14 @@ export default function AdminSidebar() {
       <div className="flex flex-col items-center w-full">
         <div className="flex items-center gap-2.5 p-6 w-full">
           <span className="font-semibold text-black text-[40px] leading-[60px] tracking-[0]">
-            Admin
+            User
           </span>
         </div>
         <nav className="flex flex-col items-center w-full">
           {navItems.map((item) => {
-            const isActive = item.href === '/admin'
-              ? pathname === '/admin'
-              : item.href === '/'
+            const isActive = item.href === '/user'
+              ? pathname === '/user'
+              : item.id === 'switch'
                 ? false
                 : pathname?.startsWith(item.href || '')
             return (
