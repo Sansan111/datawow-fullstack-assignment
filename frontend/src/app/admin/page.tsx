@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, FormEvent } from 'react'
+import { useAuth } from '@/app/lib/useAuth'
 import AdminSidebar from '@/app/components/AdminSidebar'
 import StatCards from '@/app/components/StatCards'
 import Toast from '@/app/components/Toast'
@@ -39,8 +40,10 @@ function SaveIcon() {
 type Tab = 'overview' | 'create'
 
 export default function AdminDashboardPage() {
+  const isReady = useAuth('/admin/login', 'ADMIN')
   const [activeTab, setActiveTab] = useState<Tab>('overview')
   const [concerts, setConcerts] = useState<Concert[]>([])
+  const [loading, setLoading] = useState(true)
   const [totalSeats, setTotalSeats] = useState(0)
   const [reserved, setReserved] = useState(0)
   const [cancelled, setCancelled] = useState(0)
@@ -68,6 +71,8 @@ export default function AdminDashboardPage() {
       setCancelled(0)
     } catch {
       // silently fail if not authenticated yet
+    } finally {
+      setLoading(false)
     }
   }, [])
 
@@ -112,6 +117,8 @@ export default function AdminDashboardPage() {
     }
   }
 
+  if (!isReady) return null
+
   return (
     <div className="flex min-h-screen bg-[#fbfbfb]">
       <AdminSidebar />
@@ -153,7 +160,10 @@ export default function AdminDashboardPage() {
           {/* Overview Tab */}
           {activeTab === 'overview' && (
             <div className="flex flex-col gap-[22px]">
-              {concerts.length === 0 && (
+              {loading && (
+                <p className="text-[#5c5c5c] text-xl italic p-10">Loading...</p>
+              )}
+              {!loading && concerts.length === 0 && (
                 <p className="text-[#5c5c5c] text-xl italic p-10">No concerts yet. Create one!</p>
               )}
               {concerts.map((concert) => (

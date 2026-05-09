@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useAuth } from '@/app/lib/useAuth'
 import UserSidebar from '@/app/components/UserSidebar'
 import Toast from '@/app/components/Toast'
 import {
@@ -21,8 +22,11 @@ function SeatIcon() {
 }
 
 export default function UserHomePage() {
+  const isReady = useAuth('/login')
   const [concerts, setConcerts] = useState<Concert[]>([])
+
   const [myReservations, setMyReservations] = useState<Reservation[]>([])
+  const [loading, setLoading] = useState(true)
   const [busyId, setBusyId] = useState<number | null>(null)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
 
@@ -36,6 +40,8 @@ export default function UserHomePage() {
       setMyReservations(reservations)
     } catch {
       // not authenticated
+    } finally {
+      setLoading(false)
     }
   }, [])
 
@@ -72,12 +78,18 @@ export default function UserHomePage() {
     }
   }
 
+  if (!isReady) return null
+
   return (
     <div className="flex min-h-screen bg-[#fbfbfb]">
       <UserSidebar />
 
       <main className="flex-1 flex flex-col gap-8 p-10 md:p-16 overflow-auto ml-[242px]">
-        {concerts.length === 0 && (
+        {loading && (
+          <p className="text-[#5c5c5c] text-xl italic">Loading...</p>
+        )}
+
+        {!loading && concerts.length === 0 && (
           <p className="text-[#5c5c5c] text-xl italic">No concerts available.</p>
         )}
 

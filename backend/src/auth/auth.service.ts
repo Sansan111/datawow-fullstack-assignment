@@ -10,9 +10,8 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
   ) { }
-  // register new user
+
   async register(dto: AuthDto) {
-    console.log('Registering user...');
     const userExists = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
@@ -24,13 +23,13 @@ export class AuthService {
       data: {
         email: dto.email,
         password: hashedPassword,
+        role: dto.role === 'ADMIN' ? 'ADMIN' : 'USER',
       },
     });
 
     return this.signToken(user.id, user.email, user.role);
   }
 
-  // login user
   async login(dto: AuthDto) {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
@@ -50,4 +49,3 @@ export class AuthService {
     };
   }
 }
-

@@ -33,7 +33,7 @@ export default function AdminRegisterPage() {
     setLoading(true)
 
     try {
-      const data = await registerUser(form.email, form.password)
+      const data = await registerUser(form.email, form.password, 'ADMIN')
       saveToken(data.access_token)
       router.push('/admin')
     } catch (err: unknown) {

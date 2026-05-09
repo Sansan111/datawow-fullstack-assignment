@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useAuth } from '@/app/lib/useAuth'
 import AdminSidebar from '@/app/components/AdminSidebar'
 import { getAllReservations } from '@/app/lib/concerts'
 import type { Reservation } from '@/app/lib/concerts'
@@ -12,6 +13,7 @@ function formatDate(dateStr: string) {
 }
 
 export default function AdminHistoryPage() {
+  const isReady = useAuth('/admin/login', 'ADMIN')
   const [reservations, setReservations] = useState<Reservation[]>([])
 
   const fetchData = useCallback(async () => {
@@ -28,6 +30,8 @@ export default function AdminHistoryPage() {
   }, [fetchData])
 
   const headers = ['Date time', 'Username', 'Concert name', 'Action']
+
+  if (!isReady) return null
 
   return (
     <div className="flex min-h-screen bg-[#fbfbfb]">
