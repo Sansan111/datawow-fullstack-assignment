@@ -1,34 +1,39 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Param, Delete, UseGuards, Req, ParseIntPipe, Body } from '@nestjs/common';
 import { ReservationsService } from './reservations.service';
-import { CreateReservationDto } from './dto/create-reservation.dto';
-import { UpdateReservationDto } from './dto/update-reservation.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
 
+// must be logged in to access this controller
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('reservations')
 export class ReservationsController {
   constructor(private readonly reservationsService: ReservationsService) {}
 
   @Post()
-  create(@Body() createReservationDto: CreateReservationDto) {
-    return this.reservationsService.create(createReservationDto);
+  // get request body as { "concertId": 1 } 
+  reserve(@Req() req, @Body('concertId', ParseIntPipe) concertId: number) {
+    const userId = req.user.userId; // แกะ id ของคนที่ล็อกอินมาจาก Token
+    return this.reservationsService.reserve(userId, concertId);
   }
 
-  @Get()
-  findAll() {
-    return this.reservationsService.findAll();
+  @Get('history')
+  // users can see their reservation history
+  getMyHistory(@Req() req) {
+    const userId = req.user.userId;
+    return this.reservationsService.getMyHistory(userId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.reservationsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateReservationDto: UpdateReservationDto) {
-    return this.reservationsService.update(+id, updateReservationDto);
+  @Get('all')
+  @Roles('ADMIN') // ADMIN only
+  getAllHistory() {
+    return this.reservationsService.getAllHistory();
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.reservationsService.remove(+id);
+  // get reservation id from url 
+  cancel(@Req() req, @Param('id', ParseIntPipe) reservationId: number) {
+    const userId = req.user.userId;
+    return this.reservationsService.cancel(userId, reservationId);
   }
 }
