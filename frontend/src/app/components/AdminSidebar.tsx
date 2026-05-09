@@ -60,7 +60,7 @@ export default function AdminSidebar() {
   const navItems: NavItem[] = [
     { id: 'home', label: 'Home', icon: <HomeIcon />, href: '/admin' },
     { id: 'history', label: 'History', icon: <HistoryIcon />, href: '/admin/history' },
-    { id: 'switch', label: 'Switch to user', icon: <SwitchUserIcon />, href: '/' },
+    { id: 'switch', label: 'Switch to user', icon: <SwitchUserIcon />, href: '/login' },
   ]
 
   return (

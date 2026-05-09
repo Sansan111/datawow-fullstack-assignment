@@ -12,6 +12,15 @@ function HomeIcon() {
   )
 }
 
+function HistoryIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
+  )
+}
+
 function SwitchAdminIcon() {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -50,6 +59,7 @@ export default function UserSidebar() {
 
   const navItems: NavItem[] = [
     { id: 'home', label: 'Home', icon: <HomeIcon />, href: '/user' },
+    { id: 'history', label: 'History', icon: <HistoryIcon />, href: '/user/history' },
     { id: 'switch', label: 'Switch to Admin', icon: <SwitchAdminIcon />, href: '/admin/login' },
   ]
 
@@ -63,10 +73,10 @@ export default function UserSidebar() {
         </div>
         <nav className="flex flex-col items-center w-full">
           {navItems.map((item) => {
-            const isActive = item.href === '/user'
-              ? pathname === '/user'
-              : item.id === 'switch'
-                ? false
+            const isActive = item.id === 'switch'
+              ? false
+              : item.href === '/user'
+                ? pathname === '/user'
                 : pathname?.startsWith(item.href || '')
             return (
               <div key={item.id} className="w-full p-2">
