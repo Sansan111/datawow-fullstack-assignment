@@ -15,6 +15,8 @@ export interface Reservation {
   userId: number
   status: string
   createdAt: string
+  concert: Concert
+  user?: { email: string }
 }
 
 export async function getConcerts(): Promise<Concert[]> {

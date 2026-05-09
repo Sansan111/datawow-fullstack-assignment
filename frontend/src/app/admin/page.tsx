@@ -118,7 +118,7 @@ export default function AdminDashboardPage() {
     <div className="flex min-h-screen bg-[#fbfbfb]">
       <AdminSidebar />
 
-      <main className="flex-1 flex flex-col gap-12 p-10 md:p-16 overflow-auto">
+      <main className="flex-1 flex flex-col gap-12 p-10 md:p-16 overflow-auto ml-[242px]">
         <StatCards totalSeats={totalSeats} reserved={reserved} cancelled={cancelled} />
 
         {/* Tabs */}

@@ -14,3 +14,7 @@ body {
 * {
   box-sizing: border-box;
 }
+
+button, a, [role="button"], [role="tab"] {
+  cursor: pointer;
+}

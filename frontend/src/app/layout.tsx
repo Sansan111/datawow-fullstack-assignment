@@ -12,6 +12,7 @@ const roboto = Roboto({
 export const metadata: Metadata = {
   title: "Concert Reservation",
   description: "Concert reservation system",
+  icons: { icon: [] },
 };
 
 export default function RootLayout({

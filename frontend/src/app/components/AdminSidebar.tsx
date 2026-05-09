@@ -34,7 +34,7 @@ function SwitchUserIcon() {
 function LogoutIcon() {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1-2 2h4" />
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
       <polyline points="16 17 21 12 16 7" />
       <line x1="21" y1="12" x2="9" y2="12" />
     </svg>
@@ -46,7 +46,6 @@ interface NavItem {
   label: string
   icon: React.ReactNode
   href?: string
-  onClick?: () => void
 }
 
 export default function AdminSidebar() {
@@ -65,7 +64,7 @@ export default function AdminSidebar() {
   ]
 
   return (
-    <aside className="flex flex-col w-[242px] min-h-screen items-center justify-between py-10 bg-white border-r border-[#e6e6e6] shrink-0">
+    <aside className="fixed top-0 left-0 flex flex-col w-[242px] h-screen items-center justify-between py-10 bg-white border-r border-[#e6e6e6] z-10">
       <div className="flex flex-col items-center w-full">
         <div className="flex items-center gap-2.5 p-6 w-full">
           <span className="font-semibold text-black text-[40px] leading-[60px] tracking-[0]">
@@ -80,7 +79,7 @@ export default function AdminSidebar() {
                 <button
                   type="button"
                   onClick={() => item.href && router.push(item.href)}
-                  className={`flex items-center gap-2.5 px-2 py-4 w-full rounded-lg text-left ${isActive ? 'bg-[#eaf5f9]' : ''}`}
+                  className={`flex items-center gap-2.5 px-2 py-4 w-full rounded-lg text-left cursor-pointer ${isActive ? 'bg-[#eaf5f9]' : ''}`}
                 >
                   {item.icon}
                   <span className="font-normal text-black text-2xl leading-9 tracking-[0]">
@@ -96,7 +95,7 @@ export default function AdminSidebar() {
         <button
           type="button"
           onClick={handleLogout}
-          className="flex items-center gap-2.5 px-2 py-4 w-full text-left"
+          className="flex items-center gap-2.5 px-2 py-4 w-full text-left cursor-pointer"
         >
           <LogoutIcon />
           <span className="font-normal text-black text-2xl leading-9 tracking-[0]">
