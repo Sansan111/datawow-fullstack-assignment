@@ -20,6 +20,11 @@ export default function AdminRegisterPage() {
     e.preventDefault()
     setError('')
 
+    if (!form.name.trim()) {
+      setError('Please enter your full name')
+      return
+    }
+
     if (form.password !== form.confirmPassword) {
       setError('Passwords do not match')
       return
@@ -33,7 +38,7 @@ export default function AdminRegisterPage() {
     setLoading(true)
 
     try {
-      const data = await registerUser(form.email, form.password, 'ADMIN')
+      const data = await registerUser(form.name, form.email, form.password, 'ADMIN')
       saveToken(data.access_token)
       router.push('/admin')
     } catch (err: unknown) {

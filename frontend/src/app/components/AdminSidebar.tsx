@@ -75,7 +75,7 @@ export default function AdminSidebar() {
           {navItems.map((item) => {
             const isActive = item.href === '/admin'
               ? pathname === '/admin'
-              : item.href === '/'
+              : item.id === 'switch'
                 ? false
                 : pathname?.startsWith(item.href || '')
             return (
@@ -83,7 +83,7 @@ export default function AdminSidebar() {
                 <button
                   type="button"
                   onClick={() => item.href && router.push(item.href)}
-                  className={`flex items-center gap-2.5 px-2 py-4 w-full rounded-lg text-left cursor-pointer ${isActive ? 'bg-[#eaf5f9]' : ''}`}
+                  className={`flex items-center gap-2.5 px-2 py-4 w-full rounded-lg text-left cursor-pointer hover:bg-[#eaf5f9] transition-colors ${isActive ? 'bg-[#eaf5f9]' : ''}`}
                 >
                   {item.icon}
                   <span className="font-normal text-black text-2xl leading-9 tracking-[0]">

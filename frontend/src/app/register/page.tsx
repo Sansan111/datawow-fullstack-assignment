@@ -20,6 +20,11 @@ export default function RegisterPage() {
     e.preventDefault()
     setError('')
 
+    if (!form.name.trim()) {
+      setError('Please enter your full name')
+      return
+    }
+
     if (form.password !== form.confirmPassword) {
       setError('Passwords do not match')
       return
@@ -33,7 +38,7 @@ export default function RegisterPage() {
     setLoading(true)
 
     try {
-      const data = await registerUser(form.email, form.password)
+      const data = await registerUser(form.name, form.email, form.password)
       saveToken(data.access_token)
       router.push('/user')
     } catch (err: unknown) {

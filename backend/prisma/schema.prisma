@@ -15,6 +15,7 @@ ADMIN
 
 model User {
 id Int @id @default(autoincrement())
+name String @default("")
 email String @unique
 password String
 role Role @default(USER)

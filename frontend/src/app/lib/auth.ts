@@ -9,8 +9,8 @@ export async function loginUser(email: string, password: string): Promise<AuthRe
   return res.data
 }
 
-export async function registerUser(email: string, password: string, role?: string): Promise<AuthResponse> {
-  const res = await api.post<AuthResponse>('/auth/register', { email, password, role })
+export async function registerUser(name: string, email: string, password: string, role?: string): Promise<AuthResponse> {
+  const res = await api.post<AuthResponse>('/auth/register', { name, email, password, role })
   return res.data
 }
 
