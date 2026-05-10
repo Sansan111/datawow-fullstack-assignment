@@ -174,11 +174,11 @@ export default function AdminDashboardPage() {
                   className="flex flex-col w-full items-start gap-8 p-10 bg-white rounded-lg border border-[#c2c2c2]"
                 >
                   <div className="flex flex-col items-start gap-6 w-full">
-                    <h2 className="font-semibold text-[#1692ec] text-[32px] leading-normal tracking-[0]">
+                    <h2 className="font-semibold text-[#1692ec] text-[32px] leading-normal tracking-[0] w-full break-all">
                       {concert.name}
                     </h2>
                     <hr className="w-full border-[#c2c2c2]" />
-                    <p className="font-normal text-black text-2xl leading-9 tracking-[0]">
+                    <p className="font-normal text-black text-2xl leading-9 tracking-[0] w-full break-all">
                       {concert.description}
                     </p>
                   </div>
