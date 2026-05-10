@@ -6,7 +6,7 @@ import UserSidebar from '@/app/components/UserSidebar'
 import Toast from '@/app/components/Toast'
 import {
   getConcerts,
-  getMyReservations,
+  getMyActiveReservations,
   reserveSeat,
   cancelReservation,
 } from '@/app/lib/concerts'
@@ -34,7 +34,7 @@ export default function UserHomePage() {
     try {
       const [concertList, reservations] = await Promise.all([
         getConcerts(),
-        getMyReservations().catch(() => []),
+        getMyActiveReservations().catch(() => []),
       ])
       setConcerts([...concertList].reverse())
       setMyReservations(reservations)

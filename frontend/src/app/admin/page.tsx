@@ -6,7 +6,7 @@ import AdminSidebar from '@/app/components/AdminSidebar'
 import StatCards from '@/app/components/StatCards'
 import Toast from '@/app/components/Toast'
 import DeleteConfirmDialog from '@/app/components/DeleteConfirmDialog'
-import { getConcerts, createConcert, deleteConcert, getAllReservations } from '@/app/lib/concerts'
+import { getConcerts, createConcert, deleteConcert, getReservationStats } from '@/app/lib/concerts'
 import type { Concert } from '@/app/lib/concerts'
 
 function SeatIconSmall() {
@@ -58,17 +58,17 @@ export default function AdminDashboardPage() {
 
   const fetchData = useCallback(async () => {
     try {
-      const [concertList, reservations] = await Promise.all([
+      const [concertList, stats] = await Promise.all([
         getConcerts(),
-        getAllReservations().catch(() => []),
+        getReservationStats().catch(() => ({ activeReservations: 0, canceledReservations: 0 })),
       ])
       setConcerts([...concertList].reverse())
 
       const seats = concertList.reduce((sum, c) => sum + c.totalSeats, 0)
       setTotalSeats(seats)
 
-      setReserved(reservations.length)
-      setCancelled(0)
+      setReserved(stats.activeReservations)
+      setCancelled(stats.canceledReservations)
     } catch {
       // silently fail if not authenticated yet
     } finally {

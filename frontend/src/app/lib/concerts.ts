@@ -5,6 +5,7 @@ export interface Concert {
   name: string
   description: string
   totalSeats: number
+  deletedAt: string | null
   createdAt: string
   updatedAt: string
 }
@@ -13,9 +14,25 @@ export interface Reservation {
   id: number
   concertId: number
   userId: number
+  status: 'RESERVED' | 'CANCELLED'
   createdAt: string
   concert: Concert
   user?: { email: string }
+}
+
+export interface AuditLog {
+  id: number
+  userId: number
+  concertId: number
+  action: 'RESERVE' | 'CANCEL' | 'EVENT_DELETED'
+  createdAt: string
+  concert: Concert
+  user?: { email: string }
+}
+
+export interface ReservationStats {
+  activeReservations: number
+  canceledReservations: number
 }
 
 export async function getConcerts(): Promise<Concert[]> {
@@ -32,13 +49,18 @@ export async function deleteConcert(id: number): Promise<void> {
   await api.delete(`/concerts/${id}`)
 }
 
-export async function getAllReservations(): Promise<Reservation[]> {
-  const res = await api.get<Reservation[]>('/reservations/all')
+export async function getAllReservations(): Promise<AuditLog[]> {
+  const res = await api.get<AuditLog[]>('/reservations/all')
   return res.data
 }
 
-export async function getMyReservations(): Promise<Reservation[]> {
-  const res = await api.get<Reservation[]>('/reservations/history')
+export async function getMyReservations(): Promise<AuditLog[]> {
+  const res = await api.get<AuditLog[]>('/reservations/history')
+  return res.data
+}
+
+export async function getMyActiveReservations(): Promise<Reservation[]> {
+  const res = await api.get<Reservation[]>('/reservations/active')
   return res.data
 }
 
@@ -47,5 +69,10 @@ export async function reserveSeat(concertId: number): Promise<void> {
 }
 
 export async function cancelReservation(reservationId: number): Promise<void> {
-  await api.delete(`/reservations/${reservationId}`)
+  await api.patch(`/reservations/${reservationId}/cancel`)
+}
+
+export async function getReservationStats(): Promise<ReservationStats> {
+  const res = await api.get<ReservationStats>('/reservations/stats')
+  return res.data
 }
