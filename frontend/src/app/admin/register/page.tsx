@@ -6,7 +6,7 @@ import Link from 'next/link'
 import AuthLayout from '@/app/components/AuthLayout'
 import InputField from '@/app/components/InputField'
 import { PersonIcon, LockIcon, EyeIcon, EyeOffIcon } from '@/app/components/AuthIcons'
-import { registerUser, saveToken } from '@/app/lib/auth'
+import { registerUser, saveToken, extractErrorMessage } from '@/app/lib/auth'
 
 export default function AdminRegisterPage() {
   const router = useRouter()
@@ -42,13 +42,7 @@ export default function AdminRegisterPage() {
       saveToken(data.access_token)
       router.push('/admin')
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Registration failed'
-      if (typeof err === 'object' && err !== null && 'response' in err) {
-        const axiosErr = err as { response?: { data?: { message?: string } } }
-        setError(axiosErr.response?.data?.message || msg)
-      } else {
-        setError(msg)
-      }
+      setError(extractErrorMessage(err, 'Registration failed'))
     } finally {
       setLoading(false)
     }

@@ -6,7 +6,7 @@ import Link from 'next/link'
 import AuthLayout from '@/app/components/AuthLayout'
 import InputField from '@/app/components/InputField'
 import { PersonIcon, LockIcon, EyeIcon, EyeOffIcon } from '@/app/components/AuthIcons'
-import { loginUser, saveToken } from '@/app/lib/auth'
+import { loginUser, saveToken, parseToken, extractErrorMessage } from '@/app/lib/auth'
 
 export default function AdminLoginPage() {
   const router = useRouter()
@@ -23,21 +23,15 @@ export default function AdminLoginPage() {
 
     try {
       const data = await loginUser(email, password)
-      const payload = JSON.parse(atob(data.access_token.split('.')[1]))
-      if (payload.role !== 'ADMIN') {
+      const payload = parseToken(data.access_token)
+      if (!payload || payload.role !== 'ADMIN') {
         setError("You don't have permission to access admin")
         return
       }
       saveToken(data.access_token)
       router.push('/admin')
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Login failed'
-      if (typeof err === 'object' && err !== null && 'response' in err) {
-        const axiosErr = err as { response?: { data?: { message?: string } } }
-        setError(axiosErr.response?.data?.message || msg)
-      } else {
-        setError(msg)
-      }
+      setError(extractErrorMessage(err, 'Login failed'))
     } finally {
       setLoading(false)
     }

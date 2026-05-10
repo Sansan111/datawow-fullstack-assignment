@@ -2,14 +2,15 @@
 
 import { useState, useEffect, useCallback, FormEvent } from 'react'
 import { useAuth } from '@/app/lib/useAuth'
-import AdminSidebar from '@/app/components/AdminSidebar'
+import { POLLING_INTERVAL } from '@/app/lib/auth'
+import Sidebar from '@/app/components/Sidebar'
 import StatCards from '@/app/components/StatCards'
 import Toast from '@/app/components/Toast'
 import DeleteConfirmDialog from '@/app/components/DeleteConfirmDialog'
 import { getConcerts, createConcert, deleteConcert, getReservationStats } from '@/app/lib/concerts'
 import type { Concert } from '@/app/lib/concerts'
 
-function SeatIconSmall() {
+function SeatIcon() {
   return (
     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -78,7 +79,7 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     fetchData()
-    const interval = setInterval(fetchData, 10000)
+    const interval = setInterval(fetchData, POLLING_INTERVAL)
     return () => clearInterval(interval)
   }, [fetchData])
 
@@ -123,12 +124,18 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="flex min-h-screen bg-[#fbfbfb]">
-      <AdminSidebar />
+      <Sidebar
+        title="Admin"
+        homePath="/admin"
+        historyPath="/admin/history"
+        switchLabel="Switch to user"
+        switchPath="/login"
+        logoutPath="/admin/login"
+      />
 
       <main className="flex-1 flex flex-col gap-12 p-10 md:p-16 overflow-auto ml-[242px]">
         <StatCards totalSeats={totalSeats} reserved={reserved} cancelled={cancelled} />
 
-        {/* Tabs */}
         <section className="flex flex-col gap-[22px] w-full">
           <div className="flex items-start gap-[22px]" role="tablist">
             <button
@@ -159,7 +166,6 @@ export default function AdminDashboardPage() {
             </button>
           </div>
 
-          {/* Overview Tab */}
           {activeTab === 'overview' && (
             <div className="flex flex-col gap-[22px]">
               {loading && (
@@ -184,7 +190,7 @@ export default function AdminDashboardPage() {
                   </div>
                   <div className="flex items-center justify-between w-full">
                     <div className="flex items-center gap-2">
-                      <SeatIconSmall />
+                      <SeatIcon />
                       <span className="font-normal text-black text-2xl leading-9 tracking-[0]">
                         {concert.totalSeats}
                       </span>
@@ -205,7 +211,6 @@ export default function AdminDashboardPage() {
             </div>
           )}
 
-          {/* Create Tab */}
           {activeTab === 'create' && (
             <form
               onSubmit={handleCreate}
@@ -286,7 +291,6 @@ export default function AdminDashboardPage() {
         </section>
       </main>
 
-      {/* Toast */}
       {toast && (
         <Toast
           message={toast.message}
@@ -295,7 +299,6 @@ export default function AdminDashboardPage() {
         />
       )}
 
-      {/* Delete confirmation */}
       {deleteTarget && (
         <DeleteConfirmDialog
           concertName={deleteTarget.name}

@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/app/lib/useAuth'
-import UserSidebar from '@/app/components/UserSidebar'
+import { POLLING_INTERVAL, extractErrorMessage } from '@/app/lib/auth'
+import Sidebar from '@/app/components/Sidebar'
 import Toast from '@/app/components/Toast'
 import {
   getConcerts,
@@ -24,7 +25,6 @@ function SeatIcon() {
 export default function UserHomePage() {
   const isReady = useAuth('/login')
   const [concerts, setConcerts] = useState<Concert[]>([])
-
   const [myReservations, setMyReservations] = useState<Reservation[]>([])
   const [loading, setLoading] = useState(true)
   const [busyId, setBusyId] = useState<number | null>(null)
@@ -47,7 +47,7 @@ export default function UserHomePage() {
 
   useEffect(() => {
     fetchData()
-    const interval = setInterval(fetchData, 10000)
+    const interval = setInterval(fetchData, POLLING_INTERVAL)
     return () => clearInterval(interval)
   }, [fetchData])
 
@@ -61,8 +61,7 @@ export default function UserHomePage() {
       setToast({ message: 'Reserve successfully', type: 'success' })
       await fetchData()
     } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Failed to reserve seat'
-      setToast({ message: msg, type: 'error' })
+      setToast({ message: extractErrorMessage(err, 'Failed to reserve seat'), type: 'error' })
     } finally {
       setBusyId(null)
     }
@@ -75,8 +74,7 @@ export default function UserHomePage() {
       setToast({ message: 'Cancel successfully', type: 'success' })
       await fetchData()
     } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Failed to cancel reservation'
-      setToast({ message: msg, type: 'error' })
+      setToast({ message: extractErrorMessage(err, 'Failed to cancel reservation'), type: 'error' })
     } finally {
       setBusyId(null)
     }
@@ -86,7 +84,14 @@ export default function UserHomePage() {
 
   return (
     <div className="flex min-h-screen bg-[#fbfbfb]">
-      <UserSidebar />
+      <Sidebar
+        title="User"
+        homePath="/user"
+        historyPath="/user/history"
+        switchLabel="Switch to Admin"
+        switchPath="/admin/login"
+        logoutPath="/login"
+      />
 
       <main className="flex-1 flex flex-col gap-8 p-10 md:p-16 overflow-auto ml-[242px]">
         {loading && (

@@ -21,7 +21,7 @@ function HistoryIcon() {
   )
 }
 
-function SwitchAdminIcon() {
+function SwitchIcon() {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="23 4 23 10 17 10" />
@@ -41,26 +41,28 @@ function LogoutIcon() {
   )
 }
 
-interface NavItem {
-  id: string
-  label: string
-  icon: React.ReactNode
-  href?: string
+interface SidebarProps {
+  title: string
+  homePath: string
+  historyPath: string
+  switchLabel: string
+  switchPath: string
+  logoutPath: string
 }
 
-export default function UserSidebar() {
+export default function Sidebar({ title, homePath, historyPath, switchLabel, switchPath, logoutPath }: SidebarProps) {
   const router = useRouter()
   const pathname = usePathname()
 
   const handleLogout = () => {
     removeToken()
-    router.push('/login')
+    router.push(logoutPath)
   }
 
-  const navItems: NavItem[] = [
-    { id: 'home', label: 'Home', icon: <HomeIcon />, href: '/user' },
-    { id: 'history', label: 'History', icon: <HistoryIcon />, href: '/user/history' },
-    { id: 'switch', label: 'Switch to Admin', icon: <SwitchAdminIcon />, href: '/admin/login' },
+  const navItems = [
+    { id: 'home', label: 'Home', icon: <HomeIcon />, href: homePath },
+    { id: 'history', label: 'History', icon: <HistoryIcon />, href: historyPath },
+    { id: 'switch', label: switchLabel, icon: <SwitchIcon />, href: switchPath },
   ]
 
   return (
@@ -68,21 +70,21 @@ export default function UserSidebar() {
       <div className="flex flex-col items-center w-full">
         <div className="flex items-center gap-2.5 p-6 w-full">
           <span className="font-semibold text-black text-[40px] leading-[60px] tracking-[0]">
-            User
+            {title}
           </span>
         </div>
         <nav className="flex flex-col items-center w-full">
           {navItems.map((item) => {
             const isActive = item.id === 'switch'
               ? false
-              : item.href === '/user'
-                ? pathname === '/user'
-                : pathname?.startsWith(item.href || '')
+              : item.href === homePath
+                ? pathname === homePath
+                : pathname?.startsWith(item.href)
             return (
               <div key={item.id} className="w-full p-2">
                 <button
                   type="button"
-                  onClick={() => item.href && router.push(item.href)}
+                  onClick={() => router.push(item.href)}
                   className={`flex items-center gap-2.5 px-2 py-4 w-full rounded-lg text-left cursor-pointer hover:bg-[#eaf5f9] transition-colors ${isActive ? 'bg-[#eaf5f9]' : ''}`}
                 >
                   {item.icon}
