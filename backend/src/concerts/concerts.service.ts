@@ -14,6 +14,7 @@ export class ConcertsService {
 
   async findAll() {
     return this.prisma.concert.findMany({
+      where: { deletedAt: null },
       orderBy: { createdAt: 'desc' },
     });
   }
@@ -21,9 +22,29 @@ export class ConcertsService {
   async remove(id: number) {
     const concert = await this.prisma.concert.findUnique({ where: { id } });
     if (!concert) throw new NotFoundException('Concert not found');
+    if (concert.deletedAt) throw new NotFoundException('Concert not found');
 
-    return this.prisma.concert.delete({
-      where: { id },
+    const activeReservations = await this.prisma.reservation.findMany({
+      where: { concertId: id, status: 'RESERVED' },
+      select: { userId: true },
     });
+
+    await this.prisma.$transaction([
+      this.prisma.reservation.updateMany({
+        where: { concertId: id, status: 'RESERVED' },
+        data: { status: 'CANCELLED' },
+      }),
+      this.prisma.concert.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      }),
+      ...activeReservations.map((r) =>
+        this.prisma.auditLog.create({
+          data: { userId: r.userId, concertId: id, action: 'EVENT_DELETED' },
+        }),
+      ),
+    ]);
+
+    return { message: 'Concert deleted successfully' };
   }
 }

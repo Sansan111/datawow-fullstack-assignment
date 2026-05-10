@@ -13,6 +13,17 @@ USER
 ADMIN
 }
 
+enum ReservationStatus {
+RESERVED
+CANCELLED
+}
+
+enum AuditAction {
+RESERVE
+CANCEL
+EVENT_DELETED
+}
+
 model User {
 id Int @id @default(autoincrement())
 name String @default("")
@@ -20,6 +31,7 @@ email String @unique
 password String
 role Role @default(USER)
 reservations Reservation[]
+auditLogs AuditLog[]
 createdAt DateTime @default(now())
 updatedAt DateTime @updatedAt
 }
@@ -29,19 +41,31 @@ id Int @id @default(autoincrement())
 name String
 description String
 totalSeats Int
+deletedAt DateTime?
 reservations Reservation[]
+auditLogs AuditLog[]
 createdAt DateTime @default(now())
 updatedAt DateTime @updatedAt
+}
+
+model AuditLog {
+id Int @id @default(autoincrement())
+userId Int
+concertId Int
+action AuditAction
+user User @relation(fields: [userId], references: [id])
+concert Concert @relation(fields: [concertId], references: [id])
+createdAt DateTime @default(now())
 }
 
 model Reservation {
 id Int @id @default(autoincrement())
 userId Int
 concertId Int
+status ReservationStatus @default(RESERVED)
 user User @relation(fields: [userId], references: [id])
-concert Concert @relation(fields: [concertId], references: [id], onDelete: Cascade)
+concert Concert @relation(fields: [concertId], references: [id])
 createdAt DateTime @default(now())
 
-// ป้องกันไม่ให้เกิดการจองซ้ำ 1 ที่นั่ง 1 จอง
 @@unique([userId, concertId])
 }

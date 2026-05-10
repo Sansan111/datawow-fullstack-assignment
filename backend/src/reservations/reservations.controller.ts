@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Delete, UseGuards, Req, ParseIntPipe, Body } from '@nestjs/common';
+import { Controller, Get, Post, Param, Delete, Patch, UseGuards, Req, ParseIntPipe, Body } from '@nestjs/common';
 import { ReservationsService } from './reservations.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -16,6 +16,12 @@ export class ReservationsController {
     return this.reservationsService.reserve(userId, dto.concertId);
   }
 
+  @Get('active')
+  getMyActive(@Req() req) {
+    const userId = req.user.userId;
+    return this.reservationsService.getMyActive(userId);
+  }
+
   @Get('history')
   getMyHistory(@Req() req) {
     const userId = req.user.userId;
@@ -28,7 +34,13 @@ export class ReservationsController {
     return this.reservationsService.getAllHistory();
   }
 
-  @Delete(':id')
+  @Get('stats')
+  @Roles('ADMIN')
+  getStats() {
+    return this.reservationsService.getStats();
+  }
+
+  @Patch(':id/cancel')
   cancel(@Req() req, @Param('id', ParseIntPipe) reservationId: number) {
     const userId = req.user.userId;
     return this.reservationsService.cancel(userId, reservationId);
