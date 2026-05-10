@@ -47,6 +47,8 @@ export default function UserHomePage() {
 
   useEffect(() => {
     fetchData()
+    const interval = setInterval(fetchData, 10000)
+    return () => clearInterval(interval)
   }, [fetchData])
 
   const findReservation = (concertId: number) =>
