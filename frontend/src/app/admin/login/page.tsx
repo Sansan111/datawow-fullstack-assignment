@@ -23,6 +23,11 @@ export default function AdminLoginPage() {
 
     try {
       const data = await loginUser(email, password)
+      const payload = JSON.parse(atob(data.access_token.split('.')[1]))
+      if (payload.role !== 'ADMIN') {
+        setError("You don't have permission to access admin")
+        return
+      }
       saveToken(data.access_token)
       router.push('/admin')
     } catch (err: unknown) {

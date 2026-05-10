@@ -23,6 +23,11 @@ export default function LoginPage() {
 
     try {
       const data = await loginUser(email, password)
+      const payload = JSON.parse(atob(data.access_token.split('.')[1]))
+      if (payload.role !== 'USER') {
+        setError("You don't have permission to access user")
+        return
+      }
       saveToken(data.access_token)
       router.push('/user')
     } catch (err: unknown) {
