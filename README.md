@@ -181,6 +181,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3001
 
 ## Tests
 
+**Backend**
 ```bash
 cd backend
 npm test
@@ -194,14 +195,25 @@ npm run test:cov
 What's tested:
 - Auth: register with USER/ADMIN role, register with name, duplicate email rejection,
   login success, login with wrong user, login with wrong password
-- Concert: create, create with minimum 1 seat, list active concerts only, list when empty,
-  soft-delete (cancels all reservations + creates EVENT_DELETED audit logs),
+- Concert: create, create with minimum 1 seat, list active concerts with reservation count,
+  list when empty, soft-delete (cancels all reservations + creates EVENT_DELETED audit logs),
   delete non-existent concert, delete already-deleted concert
 - Reservation: book a seat, reactivate a previously cancelled reservation,
   duplicate booking rejection, book a deleted concert, book when fully booked,
   book the last available seat, cancel, cancel non-existent, cancel someone else's
   reservation (ForbiddenException), cancel already-cancelled reservation,
   get personal history, get all history (admin), get stats (admin)
+
+**Frontend**
+```bash
+cd frontend
+npm test
+```
+
+What's tested:
+- Toast: renders success/error styles, displays message, auto-closes after 3 seconds, close button works
+- StatCards: renders all three stat cards with correct values, handles zero values
+- DeleteConfirmDialog: displays concert name, renders as dialog, Cancel and Delete buttons trigger correct callbacks
 
 ## API
 
@@ -277,6 +289,7 @@ While implementing the requirements based on the provided Figma design, I made a
   2. Automatically updates all `RESERVED` statuses for that specific concert to `CANCELLED`.
   3. Generates an `EVENT_DELETED` audit log entry for every affected user. This clarifies in their personal history that the event was canceled by the organizer, not by the user themselves.
 - **Real-Time Updates (Polling):** The frontend polls the backend every 10 seconds to automatically refresh concert availability and reservation statuses, ensuring users see the latest seat counts without manually reloading the page.
+- **Fully Booked Indicator:** The backend returns the active reservation count for each concert via `GET /concerts`. The frontend uses this to calculate availability in real time — when all seats are taken, the "Reserve" button is replaced with a disabled "Fully Booked" button (gray), so users immediately know without having to attempt a booking. Backend error messages (e.g., "Concert is fully booked", "You have already reserved a seat") are also displayed directly in the toast notification instead of generic fallback messages.
 
 ### Audit Log Action Types
 The system strictly tracks reservation events using three action types:
