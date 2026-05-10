@@ -16,6 +16,9 @@ export class ConcertsService {
     return this.prisma.concert.findMany({
       where: { deletedAt: null },
       orderBy: { createdAt: 'desc' },
+      include: {
+        _count: { select: { reservations: { where: { status: 'RESERVED' } } } },
+      },
     });
   }
 

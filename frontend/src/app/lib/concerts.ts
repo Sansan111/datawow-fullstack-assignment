@@ -8,6 +8,7 @@ export interface Concert {
   deletedAt: string | null
   createdAt: string
   updatedAt: string
+  _count?: { reservations: number }
 }
 
 export interface Reservation {

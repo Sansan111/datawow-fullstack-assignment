@@ -66,10 +66,10 @@ describe('ConcertsService', () => {
   });
 
   describe('findAll', () => {
-    it('should return only active concerts ordered by createdAt desc', async () => {
+    it('should return only active concerts with reservation count ordered by createdAt desc', async () => {
       const concerts = [
-        { id: 2, name: 'Concert B', deletedAt: null },
-        { id: 1, name: 'Concert A', deletedAt: null },
+        { id: 2, name: 'Concert B', deletedAt: null, _count: { reservations: 5 } },
+        { id: 1, name: 'Concert A', deletedAt: null, _count: { reservations: 0 } },
       ];
 
       mockPrisma.concert.findMany.mockResolvedValue(concerts);
@@ -80,6 +80,9 @@ describe('ConcertsService', () => {
       expect(mockPrisma.concert.findMany).toHaveBeenCalledWith({
         where: { deletedAt: null },
         orderBy: { createdAt: 'desc' },
+        include: {
+          _count: { select: { reservations: { where: { status: 'RESERVED' } } } },
+        },
       });
     });
 

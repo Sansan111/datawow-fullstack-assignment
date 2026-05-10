@@ -60,8 +60,9 @@ export default function UserHomePage() {
       await reserveSeat(concertId)
       setToast({ message: 'Reserve successfully', type: 'success' })
       await fetchData()
-    } catch {
-      setToast({ message: 'Failed to reserve seat', type: 'error' })
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Failed to reserve seat'
+      setToast({ message: msg, type: 'error' })
     } finally {
       setBusyId(null)
     }
@@ -73,8 +74,9 @@ export default function UserHomePage() {
       await cancelReservation(reservationId)
       setToast({ message: 'Cancel successfully', type: 'success' })
       await fetchData()
-    } catch {
-      setToast({ message: 'Failed to cancel reservation', type: 'error' })
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Failed to cancel reservation'
+      setToast({ message: msg, type: 'error' })
     } finally {
       setBusyId(null)
     }
@@ -98,6 +100,7 @@ export default function UserHomePage() {
         {concerts.map((concert) => {
           const reservation = findReservation(concert.id)
           const isReserved = !!reservation
+          const isFullyBooked = !isReserved && (concert._count?.reservations ?? 0) >= concert.totalSeats
           const isBusy = busyId === concert.id
 
           return (
@@ -131,6 +134,16 @@ export default function UserHomePage() {
                   >
                     <span className="font-medium text-white text-2xl leading-9 tracking-[0]">
                       {isBusy ? '...' : 'Cancel'}
+                    </span>
+                  </button>
+                ) : isFullyBooked ? (
+                  <button
+                    type="button"
+                    disabled
+                    className="flex w-48 items-center justify-center gap-2.5 px-4 py-3 bg-[#9ca3af] rounded cursor-not-allowed"
+                  >
+                    <span className="font-medium text-white text-2xl leading-9 tracking-[0]">
+                      Fully Booked
                     </span>
                   </button>
                 ) : (
