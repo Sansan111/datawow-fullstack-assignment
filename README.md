@@ -105,7 +105,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3001
 - bcrypt - hash passwords
 
 **Frontend**
-- Next.js 15 with App Router
+- Next.js 16.2.6 with App Router
 - Tailwind CSS v4
 - Axios
 
@@ -122,6 +122,7 @@ npm run test:cov
 ```
 
 What's tested:
+- Auth: register with USER/ADMIN role, register with name, duplicate email rejection, login success, login with wrong user, login with wrong password
 - Concert create, list, delete, and handling when concert doesn't exist
 - Reservation: booking a seat, trying to book when full, duplicate booking, canceling, canceling someone else's reservation
 
@@ -142,32 +143,45 @@ What's tested:
 - `GET /reservations/history` - my reservations
 - `GET /reservations/all` - all reservations (admin only)
 
-## Bonus: Performance
+## Bonus: Performance Optimization Strategy
 
-**What's already in the project:**
-- The `@@unique([userId, concertId])` constraint in Prisma automatically creates a composite index on the reservations table, so lookups for "did this user already book this concert?" are fast
-- Passwords are hashed with bcrypt (cost factor 10) which balances security and speed
-- Frontend uses `Promise.all` to fetch concerts and reservations in parallel instead of waiting one by one
+## Performance Optimization
 
-**What I'd add if traffic increases:**
-- Use Redis to cache the concert list since it doesn't change that often, and invalidate when admin creates or deletes
-- Add pagination on concert list and history endpoints instead of loading everything at once
-- Put static assets behind a CDN (Vercel does this for Next.js out of the box)
-- Use connection pooling (like PgBouncer) so the database doesn't get overwhelmed with connections
+If the app grows massive and traffic spikes, here is how I would optimize it to keep things fast:
+
+**1. Put static files on a CDN**
+Images and other static assets shouldn't be served by our main server. Using a CDN (like Vercel's built-in CDN or Cloudflare) makes images load faster for users and saves our server's bandwidth for actual API logic.
+
+**2. Cache heavy queries with Redis**
+The concert list gets viewed thousands of times but rarely changes. Instead of querying Postgres every single time a user opens the app, we can save that list in Redis. The app will fetch it instantly from memory. We just need to clear the cache whenever an admin creates or deletes a concert.
+
+**3. Add Database Indexes**
+As the database gets bigger, searching takes longer. I'd make sure we have indexes on columns we filter by often (like `userId` when fetching history). This stops the database from scanning every single row just to find a few records.
+
+**4. Pagination**
+Never return thousands of records in one API call. It kills the server memory and slows down the frontend. I'd add pagination to the APIs to load data in small chunks, like 20 items at a time.
 
 ## Bonus: Concurrency
 
 **What's already in the project:**
-- The `@@unique([userId, concertId])` constraint at the database level prevents the same user from booking the same concert twice, even if two requests come in at the same time. Prisma throws a P2002 error and the backend catches it and returns a ConflictException
-- The backend checks `concert._count.reservations >= concert.totalSeats` before allowing a new booking
+- The `@@unique([userId, concertId])` constraint at the database level prevents the same user from booking the same concert twice, even if two requests arrive simultaneously. Prisma throws a P2002 error and the backend catches it and returns a ConflictException.
 
-**The problem that's not fully solved yet:**
-What happens when 1,000 people try to book the last 10 seats at the exact same time? The current code checks how many reservations exist, then creates a new one if there's room. Two requests could both see "9 out of 10 booked" and both go through, ending up with 11 bookings for 10 seats.
+If 1,000 people hit the "Book" button at the exact same millisecond for the last 10 seats, a standard `SELECT` then `INSERT` will fail. All 1,000 requests will see that 10 seats are available, resulting in massive overbooking.
 
-**How I'd fix it:**
-1. Wrap the check + insert in a database transaction with `SELECT ... FOR UPDATE` on the concert row. This locks the row so only one request can read the count and insert at a time
-2. Another option is optimistic locking - add a version number to the concert, check it before inserting, and retry if someone else got there first
-3. For even higher scale, use a message queue (like BullMQ with Redis) to serialize booking requests per concert so they get processed one at a time
+Here is how I would handle this, from a basic approach to a production-ready system:
+
+**1. The Database Approach (Pessimistic Locking)**
+For standard traffic, we can solve this at the database level using a transaction with `SELECT ... FOR UPDATE`.
+* **How it works:** When the first user tries to book, this command locks the row for that specific concert in Postgres. The other 999 requests have to wait in line. Once the first user finishes booking and the seat count drops to 9, the lock is released for the next person in line.
+* **The downside:** It perfectly guarantees no overbooking, but if 1,000 people do this at once, the database will likely freeze or crash due to connection limits and lock contention.
+*(Note: Optimistic locking with a version number is bad here, because 990 users will fail the version check and keep retrying, creating a retry storm).*
+
+**2. The High-Traffic Approach (Redis + Message Queues)**
+If we are building something like Ticketmaster where extreme traffic spikes are expected, I would not let those 1,000 requests hit Postgres directly.
+
+* **Step 1: Redis Atomic Counter:** I would store the "available seats" in Redis. When 1,000 requests come in, a Redis Lua script checks the count and decrements it in one atomic operation. The first 10 get a "success", and the remaining 990 are instantly rejected. This protects Postgres entirely.
+* **Step 2: Message Queue:** The 10 successful requests are immediately pushed to a Message Queue (like RabbitMQ or AWS SQS), and the frontend tells the user "Processing your booking...".
+* **Step 3: Async Processing:** A background worker slowly picks up those 10 messages from the queue and safely writes the actual reservation records into Postgres without overwhelming the database.
 
 ## Note
 
