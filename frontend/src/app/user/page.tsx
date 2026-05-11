@@ -23,7 +23,7 @@ function SeatIcon() {
 }
 
 export default function UserHomePage() {
-  const isReady = useAuth('/login')
+  const { isReady, role } = useAuth('/login')
   const [concerts, setConcerts] = useState<Concert[]>([])
   const [myReservations, setMyReservations] = useState<Reservation[]>([])
   const [loading, setLoading] = useState(true)
@@ -88,8 +88,7 @@ export default function UserHomePage() {
         title="User"
         homePath="/user"
         historyPath="/user/history"
-        switchLabel="Switch to Admin"
-        switchPath="/admin/login"
+        {...(role === 'ADMIN' ? { switchLabel: 'Switch to Admin', switchPath: '/admin' } : {})}
         logoutPath="/login"
       />
 

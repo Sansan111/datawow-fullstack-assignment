@@ -41,7 +41,7 @@ function SaveIcon() {
 type Tab = 'overview' | 'create'
 
 export default function AdminDashboardPage() {
-  const isReady = useAuth('/admin/login', 'ADMIN')
+  const { isReady } = useAuth('/admin/login', 'ADMIN')
   const [activeTab, setActiveTab] = useState<Tab>('overview')
   const [concerts, setConcerts] = useState<Concert[]>([])
   const [loading, setLoading] = useState(true)
@@ -128,8 +128,8 @@ export default function AdminDashboardPage() {
         title="Admin"
         homePath="/admin"
         historyPath="/admin/history"
-        switchLabel="Switch to user"
-        switchPath="/login"
+        switchLabel="Switch to User"
+        switchPath="/user"
         logoutPath="/admin/login"
       />
 

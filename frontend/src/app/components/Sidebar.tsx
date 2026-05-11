@@ -45,8 +45,8 @@ interface SidebarProps {
   title: string
   homePath: string
   historyPath: string
-  switchLabel: string
-  switchPath: string
+  switchLabel?: string
+  switchPath?: string
   logoutPath: string
 }
 
@@ -62,7 +62,9 @@ export default function Sidebar({ title, homePath, historyPath, switchLabel, swi
   const navItems = [
     { id: 'home', label: 'Home', icon: <HomeIcon />, href: homePath },
     { id: 'history', label: 'History', icon: <HistoryIcon />, href: historyPath },
-    { id: 'switch', label: switchLabel, icon: <SwitchIcon />, href: switchPath },
+    ...(switchLabel && switchPath
+      ? [{ id: 'switch', label: switchLabel, icon: <SwitchIcon />, href: switchPath }]
+      : []),
   ]
 
   return (

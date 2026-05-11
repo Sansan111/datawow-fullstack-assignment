@@ -8,7 +8,7 @@ import { getMyReservations } from '@/app/lib/concerts'
 import type { AuditLog } from '@/app/lib/concerts'
 
 export default function UserHistoryPage() {
-  const isReady = useAuth('/login')
+  const { isReady, role } = useAuth('/login')
   const [logs, setLogs] = useState<AuditLog[]>([])
 
   const fetchData = useCallback(async () => {
@@ -32,8 +32,7 @@ export default function UserHistoryPage() {
         title="User"
         homePath="/user"
         historyPath="/user/history"
-        switchLabel="Switch to Admin"
-        switchPath="/admin/login"
+        {...(role === 'ADMIN' ? { switchLabel: 'Switch to Admin', switchPath: '/admin' } : {})}
         logoutPath="/login"
       />
 
