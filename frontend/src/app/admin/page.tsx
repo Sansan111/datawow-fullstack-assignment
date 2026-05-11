@@ -63,7 +63,7 @@ export default function AdminDashboardPage() {
         getConcerts(),
         getReservationStats().catch(() => ({ activeReservations: 0, canceledReservations: 0 })),
       ])
-      setConcerts([...concertList].reverse())
+      setConcerts(concertList)
 
       const seats = concertList.reduce((sum, c) => sum + c.totalSeats, 0)
       setTotalSeats(seats)

@@ -24,7 +24,7 @@ export default function HistoryTable({ logs, showUsername = false }: HistoryTabl
 
   return (
     <div className="flex flex-col items-start w-full">
-      <div className="w-full bg-white rounded overflow-hidden border border-[#5b5b5b]">
+      <div className="w-full bg-white rounded overflow-hidden border border-[#5b5b5b] table-fixed break-all">
         <div className="flex w-full">
           {headers.map((header) => (
             <div

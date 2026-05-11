@@ -111,7 +111,7 @@ export class ReservationsService {
   async getStats() {
     const [activeReservations, canceledReservations] = await Promise.all([
       this.prisma.reservation.count({ where: { status: 'RESERVED' } }),
-      this.prisma.reservation.count({ where: { status: 'CANCELLED' } }),
+      this.prisma.auditLog.count({ where: { action: { in: ['CANCEL', 'EVENT_DELETED'] } } }),
     ]);
     return { activeReservations, canceledReservations };
   }

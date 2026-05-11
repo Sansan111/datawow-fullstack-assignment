@@ -36,7 +36,7 @@ export default function UserHomePage() {
         getConcerts(),
         getMyActiveReservations().catch(() => []),
       ])
-      setConcerts([...concertList].reverse())
+      setConcerts(concertList)
       setMyReservations(reservations)
     } catch {
       // not authenticated
