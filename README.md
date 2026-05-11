@@ -90,8 +90,8 @@ NEXT_PUBLIC_API_URL=http://localhost:3001
 │           │       └── page.tsx                Admin audit log — all users' actions
 │           │
 │           ├── components/
-│           │   ├── AdminSidebar.tsx
-│           │   ├── UserSidebar.tsx
+│           │   ├── Sidebar.tsx                 Shared sidebar (handles both User/Admin)
+│           │   ├── HistoryTable.tsx            Shared history table with optional username column
 │           │   ├── AuthLayout.tsx
 │           │   ├── AuthIcons.tsx
 │           │   ├── InputField.tsx
@@ -280,7 +280,7 @@ While implementing the requirements based on the provided Figma design, I made a
 
 ### UI & Figma Extensions
 - **User Personal History Page:** The original Figma didn't specify a UI for the user's personal history. To fulfill the "Personal History" requirement, I implemented a dedicated page using a consistent table layout adapted from the Admin History design.
-- **Role Switching Navigation:** I added "Switch to User" and "Switch to Admin" buttons in the sidebar. These redirect to the respective login pages, making it much easier to test the application across different roles.
+- **Role Switching Navigation:** Admins have a "Switch to User" button in the sidebar that navigates directly to the user dashboard without requiring a separate login. From the user view, admins can switch back to the admin dashboard via "Switch to Admin". Regular users do not see any switch button since they only have access to the user role.
 - **Event Status Column:** I intentionally added an "Event Status" column to the history tables. If an admin deletes a concert, users who already booked a seat need to know exactly why their reservation changed. Instead of the record confusingly vanishing, it explicitly shows "Event Canceled" (determined by the `deletedAt` field). This keeps users informed and ensures the audit trail remains perfectly intact.
 
 ### Backend Logic & Edge Cases
